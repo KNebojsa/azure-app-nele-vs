@@ -33,7 +33,7 @@ jobs:
           path: ./myapp
 
   deploy:
-    runs-on: windows-latest
+    runs-on: ubuntu-latest  # Koristi Linux-based runner za deploy
     needs: build
     permissions:
       id-token: write
