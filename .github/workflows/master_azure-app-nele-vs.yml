@@ -10,7 +10,7 @@ jobs:
   build:
     runs-on: windows-latest
     permissions:
-      contents: read #This is required for actions/checkout
+      contents: read #Required for checkout
 
     steps:
       - uses: actions/checkout@v4
@@ -36,8 +36,8 @@ jobs:
     runs-on: windows-latest
     needs: build
     permissions:
-      id-token: write #This is required for requesting the JWT
-      contents: read #This is required for actions/checkout
+      id-token: write #Required for OIDC login
+      contents: read
 
     steps:
       - name: Download artifact from build job
@@ -57,12 +57,11 @@ jobs:
         uses: azure/webapps-deploy@v3
         with:
           app-name: 'azure-app-nele-vs'
-          slot-name: 'Production'  # Proveri da li je ovo pravi slot, ako ne koristiš slot, stavi ''
+          slot-name: 'Production'
           package: ${{env.DOTNET_ROOT}}/myapp
 
       - name: Restart Azure Web App
-        uses: azure/azure-cli-action@v1
+        uses: azure/CLI@v1
         with:
           inlineScript: |
-            az webapp restart --name azure-app-nele-vs --resource-group azure-app-nele-vs-rg # Zameni sa pravim imenom tvoje Resource Group
-
+            az webapp restart --name azure-app-nele-vs --resource-group azure-app-nele-vs-rg
