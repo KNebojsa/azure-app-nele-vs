@@ -63,3 +63,9 @@ jobs:
           app-name: 'azure-app-nele-vs-2'
           slot-name: 'Production'
           package: ./myapp
+
+      - name: List contents of deployment folder
+        run: |
+          dir ./myapp
+
+
