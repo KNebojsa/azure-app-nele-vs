@@ -10,7 +10,7 @@ jobs:
   build:
     runs-on: windows-latest
     permissions:
-      contents: read #This is required for actions/checkout
+      contents: read
 
     steps:
       - name: Checkout code
@@ -25,7 +25,7 @@ jobs:
         run: dotnet build --configuration Release
 
       - name: Publish with dotnet
-        run: dotnet publish -c Release -o ${{env.DOTNET_ROOT}}/myapp
+        run: dotnet publish ./MyApp.csproj -c Release -o ${{env.DOTNET_ROOT}}/myapp
 
       - name: List contents of publish directory
         run: dir ${{env.DOTNET_ROOT}}/myapp
@@ -40,8 +40,8 @@ jobs:
     runs-on: windows-latest
     needs: build
     permissions:
-      id-token: write #This is required for requesting the JWT
-      contents: read #This is required for actions/checkout
+      id-token: write
+      contents: read
 
     steps:
       - name: Download artifact from build job
@@ -61,18 +61,7 @@ jobs:
         uses: azure/webapps-deploy@v3
         with:
           app-name: 'azure-app-nele-vs'
-          slot-name: 'Production'  # If you're using deployment slots, keep this; otherwise, remove or use 'staging'
+          slot-name: 'Production'
           package: ${{env.DOTNET_ROOT}}/myapp
 
-      - name: Restart Azure Web App
-        uses: azure/azure-cli-action@v1
-        with:
-          inlineScript: |
-            az webapp restart --name azure-app-nele-vs --resource-group <your-resource-group>
-
-      - name: Post Login to Azure
-        uses: azure/login@v2
-        with:
-          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_F4492A39854844D799F906BD47D46A0F }}
-          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_77C77F54A39F4F0C98AA0E5CEBBBE415 }}
-          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_BA4AB0D047C6440FBCAA90B2ABB3DCF0 }}
+      - name: Restart
