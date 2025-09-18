@@ -10,11 +10,10 @@ jobs:
   build:
     runs-on: windows-latest
     permissions:
-      contents: read
+      contents: read #This is required for actions/checkout
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
       - name: Set up .NET Core
         uses: actions/setup-dotnet@v4
@@ -24,11 +23,8 @@ jobs:
       - name: Build with dotnet
         run: dotnet build --configuration Release
 
-      - name: Publish with dotnet
-        run: dotnet publish ./MyApp.csproj -c Release -o ${{env.DOTNET_ROOT}}/myapp
-
-      - name: List contents of publish directory
-        run: dir ${{env.DOTNET_ROOT}}/myapp
+      - name: dotnet publish
+        run: dotnet publish -c Release -o "${{env.DOTNET_ROOT}}/myapp"
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
@@ -40,15 +36,15 @@ jobs:
     runs-on: windows-latest
     needs: build
     permissions:
-      id-token: write
-      contents: read
+      id-token: write #This is required for requesting the JWT
+      contents: read #This is required for actions/checkout
 
     steps:
       - name: Download artifact from build job
         uses: actions/download-artifact@v4
         with:
           name: .net-app
-
+      
       - name: Login to Azure
         uses: azure/login@v2
         with:
@@ -61,7 +57,12 @@ jobs:
         uses: azure/webapps-deploy@v3
         with:
           app-name: 'azure-app-nele-vs'
-          slot-name: 'Production'
+          slot-name: 'Production'  # Proveri da li je ovo pravi slot, ako ne koristiš slot, stavi ''
           package: ${{env.DOTNET_ROOT}}/myapp
 
-      - name: Restart
+      - name: Restart Azure Web App
+        uses: azure/azure-cli-action@v1
+        with:
+          inlineScript: |
+            az webapp restart --name azure-app-nele-vs --resource-group azure-app-nele-vs-rg # Zameni sa pravim imenom tvoje Resource Group
+
