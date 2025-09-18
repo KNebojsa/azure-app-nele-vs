@@ -1,7 +1,4 @@
-# GitHub Actions workflow - CI/CD za ASP.NET Core aplikaciju na Azure Web App
-# Koristi Publish Profile metod (jednostavan i stabilan)
-
-name: Build and deploy ASP.Net Core app to Azure Web App - azure-app-nele-vs-2
+name: Build and deploy ASP.Net Core app to Azure Web App - azure-app-nele-vs
 
 on:
   push:
@@ -16,8 +13,7 @@ jobs:
       contents: read
 
     steps:
-      - name: Checkout source
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
       - name: Set up .NET Core
         uses: actions/setup-dotnet@v4
@@ -27,32 +23,42 @@ jobs:
       - name: Build with dotnet
         run: dotnet build --configuration Release
 
-      - name: Publish project
-        run: dotnet publish -c Release -o ./publish
+      - name: dotnet publish
+        run: dotnet publish -c Release -o ./published
 
-      - name: Upload artifact
+      - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
         with:
           name: .net-app
-          path: ./publish
+          path: ./published
 
   deploy:
     runs-on: windows-latest
     needs: build
+    environment:
+      name: 'Production'
+      url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
+    permissions:
+      id-token: write
+      contents: read
 
     steps:
-      - name: Download artifact
+      - name: Download artifact from build job
         uses: actions/download-artifact@v4
         with:
           name: .net-app
-          path: ./myapp
+
+      - name: Login to Azure
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_F4492A39854844D799F906BD47D46A0F }}
+          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_77C77F54A39F4F0C98AA0E5CEBBBE415 }}
+          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_BA4AB0D047C6440FBCAA90B2ABB3DCF0 }}
 
       - name: Deploy to Azure Web App
-        uses: azure/webapps-deploy@v2
+        id: deploy-to-webapp
+        uses: azure/webapps-deploy@v3
         with:
-          app-name: 'azure-app-nele-vs-2'
-          publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
-          package: ./myapp
-
-      - name: List deployed files (debug)
-        run: dir ./myapp
+          app-name: 'azure-app-nele-vs'
+          slot-name: 'Production'
+          package: .
