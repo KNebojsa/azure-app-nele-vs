@@ -54,9 +54,9 @@ jobs:
       - name: Login to Azure
         uses: azure/login@v2
         with:
-          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_F4492A39854844D799F906BD47D46A0F }}
-          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_77C77F54A39F4F0C98AA0E5CEBBBE415 }}
-          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_BA4AB0D047C6440FBCAA90B2ABB3DCF0 }}
+          azure-subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_BA4AB0D047C6440FBCAA90B2ABB3DCF0 }}
+          identity: ${{ secrets.AZUREAD_CLIENTID }}
+          federated-identity-token: ${{ steps.oidc.token }}
 
       - name: Deploy to Azure Web App
         id: deploy-to-webapp
@@ -65,3 +65,4 @@ jobs:
           app-name: 'azure-app-nele-vs'
           slot-name: 'Production'
           package: ./publish
+
