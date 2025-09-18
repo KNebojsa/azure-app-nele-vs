@@ -1,3 +1,6 @@
+# Docs for the Azure Web Apps Deploy action: https://github.com/Azure/webapps-deploy
+# More GitHub Actions for Azure: https://github.com/Azure/actions
+
 name: Build and deploy ASP.Net Core app to Azure Web App - azure-app-nele-vs
 
 on:
@@ -10,7 +13,7 @@ jobs:
   build:
     runs-on: windows-latest
     permissions:
-      contents: read
+      contents: read #This is required for actions/checkout
 
     steps:
       - uses: actions/checkout@v4
@@ -24,27 +27,26 @@ jobs:
         run: dotnet build --configuration Release
 
       - name: dotnet publish
-        run: dotnet publish -c Release -o ./myapp
+        run: dotnet publish -c Release -o "${{env.DOTNET_ROOT}}/myapp"
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
         with:
           name: .net-app
-          path: ./myapp
+          path: ${{env.DOTNET_ROOT}}/myapp
 
   deploy:
-    runs-on: ubuntu-latest  # Koristi Linux-based runner za deploy
+    runs-on: windows-latest
     needs: build
     permissions:
-      id-token: write
-      contents: read
+      id-token: write #This is required for requesting the JWT
+      contents: read #This is required for actions/checkout
 
     steps:
       - name: Download artifact from build job
         uses: actions/download-artifact@v4
         with:
           name: .net-app
-          path: ./myapp
       
       - name: Login to Azure
         uses: azure/login@v2
@@ -59,10 +61,4 @@ jobs:
         with:
           app-name: 'azure-app-nele-vs'
           slot-name: 'Production'
-          package: ./myapp
-
-      - name: Restart Azure Web App
-        uses: azure/CLI@v1
-        with:
-          inlineScript: |
-            az webapp restart --name azure-app-nele-vs --resource-group azure-app-nele-vs-rg
+          package: .
