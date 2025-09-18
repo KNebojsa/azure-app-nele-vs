@@ -1,7 +1,7 @@
 # Docs for the Azure Web Apps Deploy action: https://github.com/Azure/webapps-deploy
 # More GitHub Actions for Azure: https://github.com/Azure/actions
 
-name: Build and deploy ASP.Net Core app to Azure Web App - azure-app-nele-vs
+name: Build and deploy ASP.Net Core app to Azure Web App - azure-app-nele-vs-2
 
 on:
   push:
@@ -51,14 +51,15 @@ jobs:
       - name: Login to Azure
         uses: azure/login@v2
         with:
-          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_F4492A39854844D799F906BD47D46A0F }}
-          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_77C77F54A39F4F0C98AA0E5CEBBBE415 }}
-          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_BA4AB0D047C6440FBCAA90B2ABB3DCF0 }}
+          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_DAB22D96EA0144418EE364829F5AE6BC }}
+          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_D8AF8A35998F458384A42E623F8F3847 }}
+          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_E7814649E83343C297362B3C00E2F79C }}
 
       - name: Deploy to Azure Web App
         id: deploy-to-webapp
         uses: azure/webapps-deploy@v3
         with:
-          app-name: 'azure-app-nele-vs'
+          app-name: 'azure-app-nele-vs-2'
           slot-name: 'Production'
           package: .
+          
