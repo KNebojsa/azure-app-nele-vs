@@ -1,4 +1,4 @@
-# Docs for the Azure Web Apps Deploy action: https://github.com/Azure/webapps-deploy
+# Deploy ASP.NET Core app to Azure using GitHub Actions & OIDC
 
 name: Build and deploy ASP.Net Core app to Azure Web App - azure-app-nele-vs
 
